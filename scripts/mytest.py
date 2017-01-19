@@ -4,8 +4,8 @@ from sensor_msgs.msg import Image
 from std_msgs.msg import String, Header
 from cv_bridge import CvBridge, CvBridgeError
 from message_filters import TimeSynchronizer, Subscriber
-from test.msg import bbox,bbox_array
-from test.msg import conf,Face,Face_array
+from Ros_Coms.msg import bbox,bbox_array
+from Ros_Coms.msg import conf,Face,Face_array
 import cv2
 import appbridge
 import dlib
