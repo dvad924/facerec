@@ -6,6 +6,7 @@ from cv_bridge import CvBridge, CvBridgeError
 from message_filters import TimeSynchronizer, Subscriber
 from Ros_Coms.msg import bbox,bbox_array
 from Ros_Coms.msg import conf,Face,Face_array
+from commandhandler import commandhandler
 import cv2
 import appbridge
 import dlib
@@ -31,13 +32,13 @@ frCB,frDestroy = appbridge.init()
 publisher1 = None
 publisher2 = None
 
-settings = None
+settings = {}
 def todrect(bbox):
     rec = drec( bbox )
     return dlib.rectangle( rec.left(), rec.top(), rec.right(), rec.bottom() )
     
-def furtherCallback( data ):
-    return frCB( data )
+def furtherCallback( data, options ):
+    return frCB( data , options )
 
 def tobbox( box ):
     b = bbox()
@@ -74,7 +75,9 @@ def callback( im_msg, bbox_array ):
         len( bboxes )
         if len( bboxes ) == 0:
             return
-        f,finfo = furtherCallback( ( bboxes, cv2_img ) )    
+        global settings
+        print( settings )
+        f,finfo = furtherCallback( ( bboxes, cv2_img ), settings )    
         frame1_message = bridge.cv2_to_imgmsg( f, "bgr8" )
         face_msg = toFaceMsgs( finfo )
         
@@ -100,7 +103,7 @@ def main():
     outanns = rospy.resolve_name( "out" )
     viz     = rospy.resolve_name( "viz" )
     outface = rospy.resolve_name( "outface" )
-
+    uicmds  = rospy.resolve_name( "uicmds" )
 
     
     incam   = incam   if incam   != "/incam"   else "/darknet_cam"
@@ -108,14 +111,15 @@ def main():
     outanns = outanns if outanns != "/out"     else "/TheFaces/annotated"
     viz     = viz     if viz     != "/viz"     else "/TheFaces/viz"
     outface = outface if outface != "/outface" else "/TheFaces/labels"
-
+    uicmds  = uicmds  if uicmds  != "/uicmds"  else "/ui_msg"
     
     print( "img topic:" , incam )
     print( "bbox topic:", inboxes )
     print( "out annot: ", outanns )
     print( "viz:" , viz )
     print( "outface:", outface )
-
+    print( "uicmds:" , uicmds )
+    
     #identify global variables
     global publisher1
     global publisher2 
@@ -130,7 +134,7 @@ def main():
     #####################################################################
 
     # GUI command listener
-    # guicmds = rospy.Subscriber( uicmds, String, cmdcallback )
+    rospy.Subscriber( uicmds, String, cmdcallback )
     ####################################################################
     rospy.spin()
 
