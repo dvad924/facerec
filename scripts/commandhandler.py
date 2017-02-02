@@ -21,4 +21,9 @@ def parse_cmd( msg, settings ):
     elif ( msg_parts[0] == 'stop' ):
         settings['label'] = None
         settings['store'] = False
-    
+
+    elif ( msg_parts[0] == 'save' ):
+        settings['save'] = msg_parts[1]
+
+    elif (msg_parts[0] == 'load' ):
+        settings['load'] = msg_parts[1]
